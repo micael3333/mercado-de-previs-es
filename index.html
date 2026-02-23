@@ -1,1 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE INSIDER | Mercado de Informação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #111111;
+            --neon-green: #00ff41;
+            --text-main: #e0e0e0;
+            --text-muted: #666666;
+            --border-color: #333333;
+            --btn-yes: #00ff41;
+            --btn-no: #ff003c;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Scanlines Effect (O Efeito de TV Antiga/Terminal) */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* HEADER */
+        header {
+            width: 100%;
+            padding: 20px;
+            border-bottom: 1px solid var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(5, 5, 5, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-green);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .connect-btn {
+            background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .connect-btn:hover {
+            background: var(--neon-green);
+            color: var(--bg-color);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* HERO SECTION & GLITCH */
+        .hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .glitch-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .glitch {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Animação Básica de Glitch (CSS Puro) */
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 blue;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 44px, 0); }
+            20% { clip: rect(80px, 9999px, 92px, 0); }
+            40% { clip: rect(33px, 9999px, 58px, 0); }
+            60% { clip: rect(66px, 9999px, 15px, 0); }
+            80% { clip: rect(98px, 9999px, 83px, 0); }
+            100% { clip: rect(2px, 9999px, 35px, 0); }
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* FILTROS (Navegação Polymarket style) */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            overflow-x: auto;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 20px;
+            scrollbar-width: none; /* Esconde scroll no Firefox */
+        }
+        .filters::-webkit-scrollbar { display: none; } /* Esconde scroll no Chrome/Safari */
+
+        .filter-tag {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .filter-tag.active, .filter-tag:hover {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        /* GRID DE MERCADOS */
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            margin-bottom: 50px;
+        }
+
+        .market-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-card:hover {
+            transform: translateY(-5px);
+            border-color: #555;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Detalhezinho estético no card */
+        .market-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--neon-green);
+            opacity: 0.5;
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .market-volume {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .market-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* AREA DE APOSTAS (Botões SIM/NÃO) */
+        .bet-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bet-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .bet-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .bet-row.yes:hover { border-color: rgba(0, 255, 65, 0.3); }
+        .bet-row.no:hover { border-color: rgba(255, 0, 60, 0.3); }
+
+        .bet-label {
+            font-weight: bold;
+        }
+        
+        .bet-row.yes .bet-label { color: var(--btn-yes); }
+        .bet-row.no .bet-label { color: var(--btn-no); }
+
+        .bet-price {
+            font-size: 1.1rem;
+        }
+
+        /* RESPONSIVIDADE EXTREMA */
+        @media (max-width: 600px) {
+            .glitch { font-size: 1.8rem; }
+            .hero { padding: 40px 15px 20px; }
+            .market-grid { grid-template-columns: 1fr; padding: 15px; }
+            .logo { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">THE_INSIDER</div>
+        <button class="connect-btn" id="connectWalletBtn">Log In [ >_ ]</button>
+    </header>
+
+    <section class="hero">
+        <div class="glitch-wrapper">
+            <h1 class="glitch" data-text="A VERDADE TEM UM PREÇO.">A VERDADE TEM UM PREÇO.</h1>
+        </div>
+        <p>Opere informações privilegiadas. Preveja o futuro. Lucre com a realidade.</p>
+    </section>
+
+    <div class="filters">
+        <div class="filter-tag active">🔥 Em Alta</div>
+        <div class="filter-tag">🏛️ Política BR</div>
+        <div class="filter-tag">👁️ Conspirações</div>
+        <div class="filter-tag">📺 Reality (BBB)</div>
+        <div class="filter-tag">📉 Economia Obscura</div>
+    </div>
+
+    <main class="market-grid">
+        
+        <article class="market-card">
+            <div class="market-header">
+                <span>Expira: 31 Dez 2026</span>
+                <span class="market-volume">💰 $1.2M Vol.</span>
+            </div>
+            <h2 class="market-title">O Pentágono irá confirmar oficialmente a recuperação de naves não-humanas (UAPs)?</h2>
+            <div class="bet-area">
+                <div class="bet-row yes">
+                    <span class="bet-label">SIM</span>
+                    <span class="bet-price">18¢</span>
+                </div>
+                <div class="bet-row no">
+                    <span class="bet-label">NÃO</span>
+                    <span class="bet-price">82¢</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="market-card">
+            <div class="market-header">
+                <span>Expira: Terça, 23:59</span>
+                <span class="market-volume">💰 $450k Vol.</span>
+            </div>
+            <h2 class="market-title">Participante 'X' será expulso do reality show por agressão física esta semana?</h2>
+            <div class="bet-area">
+                <div class="bet-row yes">
+                    <span class="bet-label">SIM</span>
+                    <span class="bet-price">65¢</span>
+                </div>
+                <div class="bet-row no">
+                    <span class="bet-label">NÃO</span>
+                    <span class="bet-price">35¢</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="market-card">
+            <div class="market-header">
+                <span>Expira: 30 Nov 2026</span>
+                <span class="market-volume">💰 $8.5M Vol.</span>
+            </div>
+            <h2 class="market-title">Haverá um pedido oficial de impeachment protocolado contra o Presidente do Brasil em 2026?</h2>
+            <div class="bet-area">
+                <div class="bet-row yes">
+                    <span class="bet-label">SIM</span>
+                    <span class="bet-price">42¢</span>
+                </div>
+                <div class="bet-row no">
+                    <span class="bet-label">NÃO</span>
+                    <span class="bet-price">58¢</span>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+    <script>
+        document.getElementById('connectWalletBtn').addEventListener('click', function() {
+            this.innerText = "Conectando...";
+            setTimeout(() => {
+                this.innerText = "0xD9...CD2D";
+                this.style.background = "rgba(0, 255, 65, 0.1)";
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
